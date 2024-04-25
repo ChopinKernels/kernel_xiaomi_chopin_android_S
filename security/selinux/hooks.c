@@ -4905,13 +4905,13 @@ static int selinux_sock_rcv_skb_compat(struct sock *sk, struct sk_buff *skb,
 	if (err)
 		return err;
 
-	if (selinux_secmark_enabled()) {
-		err = avc_has_perm(&selinux_state,
-				   sk_sid, skb->secmark, SECCLASS_PACKET,
-				   PACKET__RECV, &ad);
-		if (err)
-			return err;
-	}
+	// if (selinux_secmark_enabled()) {
+	// 	err = avc_has_perm(&selinux_state,
+	// 			   sk_sid, skb->secmark, SECCLASS_PACKET,
+	// 			   PACKET__RECV, &ad);
+	// 	if (err)
+	// 		return err;
+	// }
 
 	err = selinux_netlbl_sock_rcv_skb(sksec, skb, family, &ad);
 	if (err)
@@ -4981,13 +4981,13 @@ static int selinux_socket_sock_rcv_skb(struct sock *sk, struct sk_buff *skb)
 		}
 	}
 
-	if (secmark_active) {
-		err = avc_has_perm(&selinux_state,
-				   sk_sid, skb->secmark, SECCLASS_PACKET,
-				   PACKET__RECV, &ad);
-		if (err)
-			return err;
-	}
+	// if (secmark_active) {
+	// 	err = avc_has_perm(&selinux_state,
+	// 			   sk_sid, skb->secmark, SECCLASS_PACKET,
+	// 			   PACKET__RECV, &ad);
+	// 	if (err)
+	// 		return err;
+	// }
 
 	return err;
 }
@@ -5374,11 +5374,11 @@ static unsigned int selinux_ip_forward(struct sk_buff *skb,
 		}
 	}
 
-	if (secmark_active)
-		if (avc_has_perm(&selinux_state,
-				 peer_sid, skb->secmark,
-				 SECCLASS_PACKET, PACKET__FORWARD_IN, &ad))
-			return NF_DROP;
+	// if (secmark_active)
+	// 	if (avc_has_perm(&selinux_state,
+	// 			 peer_sid, skb->secmark,
+	// 			 SECCLASS_PACKET, PACKET__FORWARD_IN, &ad))
+	// 		return NF_DROP;
 
 	if (netlbl_active)
 		/* we do this in the FORWARD path and not the POST_ROUTING
@@ -5487,11 +5487,11 @@ static unsigned int selinux_ip_postroute_compat(struct sk_buff *skb,
 	if (selinux_parse_skb(skb, &ad, &addrp, 0, &proto))
 		return NF_DROP;
 
-	if (selinux_secmark_enabled())
-		if (avc_has_perm(&selinux_state,
-				 sksec->sid, skb->secmark,
-				 SECCLASS_PACKET, PACKET__SEND, &ad))
-			return NF_DROP_ERR(-ECONNREFUSED);
+	// if (selinux_secmark_enabled())
+	// 	if (avc_has_perm(&selinux_state,
+	// 			 sksec->sid, skb->secmark,
+	// 			 SECCLASS_PACKET, PACKET__SEND, &ad))
+	// 		return NF_DROP_ERR(-ECONNREFUSED);
 
 	if (selinux_xfrm_postroute_last(sksec->sid, skb, &ad, proto))
 		return NF_DROP_ERR(-ECONNREFUSED);
@@ -5611,11 +5611,11 @@ static unsigned int selinux_ip_postroute(struct sk_buff *skb,
 	if (selinux_parse_skb(skb, &ad, &addrp, 0, NULL))
 		return NF_DROP;
 
-	if (secmark_active)
-		if (avc_has_perm(&selinux_state,
-				 peer_sid, skb->secmark,
-				 SECCLASS_PACKET, secmark_perm, &ad))
-			return NF_DROP_ERR(-ECONNREFUSED);
+	// if (secmark_active)
+	// 	if (avc_has_perm(&selinux_state,
+	// 			 peer_sid, skb->secmark,
+	// 			 SECCLASS_PACKET, secmark_perm, &ad))
+	// 		return NF_DROP_ERR(-ECONNREFUSED);
 
 	if (peerlbl_active) {
 		u32 if_sid;
