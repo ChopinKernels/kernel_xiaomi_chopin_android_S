@@ -6,6 +6,7 @@ this file is only for attribution of chopin
 &lk_charger {
 	max_charger_voltage = <14500000>;
 
+	/* charging current */
 	usb_charger_current = <500000>;
 	ac_charger_current = <1500000>;
 	ac_charger_input_current = <1500000>;
@@ -14,6 +15,7 @@ this file is only for attribution of chopin
 	ta_ac_charger_current = <1500000>;
 	pd_charger_current = <1500000>;
 
+	/* battery temperature protection */
 	temp_t4_threshold = <60>;
 	temp_t3_threshold = <0>;
 	temp_t1_threshold = <(-10)>;
@@ -24,6 +26,7 @@ this file is only for attribution of chopin
 
 	battery_cv = <4460000>;
 
+	/* vote */
 	enable_vote;
 	enable_cv_step;
 	enable_cv_aging;
@@ -43,6 +46,7 @@ this file is only for attribution of chopin
 	current_step_aging = <200000>;
 	current_max_aging = <12400000>;
 
+	/* ffc */
 	enable_ffc;
 	non_ffc_ieoc = <150000>;
 	non_ffc_cv = <4450000>;
@@ -51,6 +55,7 @@ this file is only for attribution of chopin
 	ffc_cv = <4490000>;
 
 	enable_sw_jeita;
+	/* sw jeita */
 	jeita_temp_above_t4_cv = <4100000>;
 	jeita_temp_t3_to_t4_cv = <4100000>;
 	jeita_temp_t2_to_t3_cv = <4450000>;
@@ -82,7 +87,7 @@ this file is only for attribution of chopin
 	temp_t0_to_t1_fcc = <2500000>;
 	temp_tn1_to_t0_fcc_a = <1000000>;
 	temp_tn1_to_t0_fcc_b = <744750>;
-
+	/* battery temperature protection */
 	enable_min_charge_temp;
 	min_charge_temp = <0>;
 	min_charge_temp_plus_x_degree = <2>;
@@ -114,11 +119,15 @@ this file is only for attribution of chopin
 		5000000 4200000 3000000 2500000 1500000 1000000 800000
 		500000 100000>;
 
+	/* enable_pe_plus; */
+	/* enable_pe_2; */
 	bc12_charger = <1>;
 
 	charging_host_charger_current = <1500000>;
+	/* common */
 	max_charger_voltage = <14500000>;
 
+	/* xiaomi pps */
 	xm_pps_single_charger_input_current = <3000000>;
 	xm_pps_single_charger_current = <6000000>;
 	xm_pps_dual_charger_input_current = <3000000>;
@@ -128,9 +137,12 @@ this file is only for attribution of chopin
 	xm_pps_max_ibus = <3000000>;
 	xm_pps_single_charger_current_non_verified_pps = <4800000>;
 
+	/* PD */
 	pd_vbus_upper_bound = <9000000>;
 	ac_charger_input_current = <1500000>;
+	/* float charger */
 	non_std_ac_charger_current = <1000000>;
+	/* default ac charger charge current */
 	ac_charger_current = <2000000>;
 
 	use_xmusb350_do_apsd;
@@ -176,6 +188,7 @@ this file is only for attribution of chopin
 	mi,pd-bus-curr-max = <6200>;
 	mi,pd-non-ffc-bat-volt-max = <4450>;
 	mi,cp-sec-enable;
+	mi,pd-power-max = <67>; /*charge power max : 67W */
 	mi,cp-master-disable-fisrt;
 };
 
@@ -196,19 +209,13 @@ this file is only for attribution of chopin
 };
 
 &odm {
-	simtray {
-		compatible = "xiaomi,simtray-status";
-		status-gpio =	<&pio 43 0>;
-	};
-};
-
-&odm {
 	thermal_message: thermal-message {
 		board-sensor = "VIRTUAL-SENSOR";
 	};
 };
 
 &pio {
+	/* bq25970-master */
 	bq2597x_master_int_default: bq2597x_master_int_default {
 		pins_cmd_dat {
 			pinmux = <PINMUX_GPIO21__FUNC_GPIO21>;
@@ -225,6 +232,7 @@ this file is only for attribution of chopin
 		};
 	};
 
+	/* bq25970-slave */
 	bq2597x_slave_int_default: bq2597x_slave_int_default {
 		pins_cmd_dat {
 			pinmux = <PINMUX_GPIO16__FUNC_GPIO16>;
@@ -241,6 +249,7 @@ this file is only for attribution of chopin
 		};
 	};
 
+	/* xmusb350 */
 	xmusb350_int_normal: xmusb350_int_normal {
 		pins_cmd_dat {
 			pinmux = <PINMUX_GPIO110__FUNC_GPIO110>;
@@ -327,8 +336,16 @@ this file is only for attribution of chopin
 
 		charger_name = "quaternary_chg";
 
+		//ti,bq2597x,bat-ovp-disable;
+		//ti,bq2597x,bat-ovp-alarm-disable;
+		//ti,bq2597x,bat-ocp-disable;
+		//ti,bq2597x,bat-ocp-alarm-disable;
 		ti,bq2597x,bat-ucp-alarm-disable;
 		ti,bq2597x,bat-ucp-disable;
+
+		//ti,bq2597x,bus-ovp-alarm-disable;
+		//ti,bq2597x,bus-ocp-disable;
+		//ti,bq2597x,bus-ocp-alarm-disable;
 		ti,bq2597x,bat-therm-disable;
 		ti,bq2597x,bus-therm-disable;
 		ti,bq2597x,die-therm-disable;
@@ -343,13 +360,16 @@ this file is only for attribution of chopin
 		ti,bq2597x,bus-ocp-threshold = <3750>;
 		ti,bq2597x,bus-ocp-alarm-threshold = <3500>;
 
-		ti,bq2597x,bat-therm-threshold = <0x15>;
-		ti,bq2597x,bus-therm-threshold = <0x15>;
+		//ti,bq2597x,bat-ucp-alarm-threshold = <2000>;
+
+		ti,bq2597x,bat-therm-threshold = <0x15>;/*4.1%*/
+		ti,bq2597x,bus-therm-threshold = <0x15>;/*4.1%*/
 		ti,bq2597x,die-therm-threshold = <145>;
 
 		ti,bq2597x,ac-ovp-threshold = <14>;
 		sc8551,ac-ovp-threshold = <13>;
 
+		//ti,bq2597x,sense-resistor-mohm = <5>;
 		sc8551,bypass-enable;
 		sc8551a,dual-stdalone-scheme;
 	};
@@ -413,8 +433,16 @@ this file is only for attribution of chopin
 
 		charger_name = "tertiary_chg";
 
+		//ti,bq2597x,bat-ovp-disable;
+		//ti,bq2597x,bat-ovp-alarm-disable;
+		//ti,bq2597x,bat-ocp-disable;
+		//ti,bq2597x,bat-ocp-alarm-disable;
 		ti,bq2597x,bat-ucp-alarm-disable;
 		ti,bq2597x,bat-ucp-disable;
+
+		//ti,bq2597x,bus-ovp-alarm-disable;
+		//ti,bq2597x,bus-ocp-disable;
+		//ti,bq2597x,bus-ocp-alarm-disable;
 		ti,bq2597x,bat-therm-disable;
 		ti,bq2597x,bus-therm-disable;
 		ti,bq2597x,die-therm-disable;
@@ -426,16 +454,21 @@ this file is only for attribution of chopin
 
 		ti,bq2597x,bus-ovp-threshold = <12000>;
 		ti,bq2597x,bus-ovp-alarm-threshold = <11000>;
+		//ti,bq2597x,bus-ocp-threshold = <2200>;
+		//ti,bq2597x,bus-ocp-alarm-threshold = <2000>;
 		ti,bq2597x,bus-ocp-threshold = <3750>;
 		ti,bq2597x,bus-ocp-alarm-threshold = <3500>;
 
-		ti,bq2597x,bat-therm-threshold = <0x15>;
-		ti,bq2597x,bus-therm-threshold = <0x15>;
+		//ti,bq2597x,bat-ucp-alarm-threshold = <2000>;
+
+		ti,bq2597x,bat-therm-threshold = <0x15>;/*4.1%*/
+		ti,bq2597x,bus-therm-threshold = <0x15>;/*4.1%*/
 		ti,bq2597x,die-therm-threshold = <145>;
 
 		ti,bq2597x,ac-ovp-threshold = <14>;
 		sc8551,ac-ovp-threshold = <13>;
 
+		//ti,bq2597x,sense-resistor-mohm = <5>;
 		sc8551,bypass-enable;
 		sc8551a,dual-stdalone-scheme;
 	};
@@ -707,14 +740,14 @@ this file is only for attribution of chopin
 		vib_cont_zc_thr = < 0x08f8 >;  /*hq 0x08F8 */
 		vib_cont_num_brk = < 3 >;
 		vib_f0_coeff = < 260 >; /*Don't modify it    2.604167*/
-		vib_f0_trace_parameter = < 9 3 1 31 >;
+		vib_f0_trace_parameter = < 0x05 0x03 0x02 0x0f >;
 		vib_bemf_config = < 0 0x08 0x03 0xf8 >;
 		vib_sw_brake = < 0x2c >;
 		vib_tset = < 0x1a >;
 		vib_r_spare = < 0x68 >;
 		vib_bstdbg = < 0x30 0xeb 0xd4 0 0 0 >;
 		vib_effect_id_boundary = < 10 >;
-		vib_effect_max = < 193 >;   /*vib_effect_max must bigger than vib_effect_id*/
+		vib_effect_max = < 197 >;   /*vib_effect_max must bigger than vib_effect_id*/
 		vib_trig_config = < 0 1 0 1 2
 						0 1 0 1 2
 						0 1 0 1 2 >;
@@ -904,3 +937,4 @@ this file is only for attribution of chopin
 &tboard_thermistor4 {
 	thermal_rename = "charger_therm";
 };
+

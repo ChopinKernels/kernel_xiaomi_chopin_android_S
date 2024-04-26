@@ -1,6 +1,5 @@
 /*
  * Copyright (c) 2017 MediaTek Inc.
- * Copyright (C) 2021 XiaoMi, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -58,6 +57,7 @@
 			ircmp_vclamp = <32000>;		/* uV */
 			en_te = <1>;
 			en_wdt = <1>;
+			en_otg_wdt = <1>;
 			aicc_once = <1>;
 			post_aicc = <1>;
 			batoc_notify = <0>;

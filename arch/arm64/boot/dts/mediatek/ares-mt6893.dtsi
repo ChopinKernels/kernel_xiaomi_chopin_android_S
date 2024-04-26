@@ -5,16 +5,254 @@ this file is only for attribution of ares
 #include "mediatek/cust_mt6893_camera.dtsi"
 
 &odm {
-	simtray {
-		compatible = "xiaomi,simtray-status";
-		status-gpio = <&pio 43 0>;
+	thermal_message: thermal-message {
+		board-sensor = "VIRTUAL-SENSOR";
+	};
+};
+
+/*TOUCH begin*/
+/*mt_pmic_vs1_buck_reg*/
+&mt6359regulator {
+	touch_avdd_i2c_vreg: touch_avdd_i2c_vreg {
+		compatible = "regulator-fixed";
+		regulator-min-microvolt = <1800000>;
+		regulator-max-microvolt = <1800000>;
+		regulator-name = "touch_avdd_i2c_vreg";
+		enable-active-high;
+		gpio = <&pio 27 0>;
+	};
+};
+
+&pio {
+	ts_reset_active: ts_reset_active {
+		pins_cmd_dat {
+			pinmux = <PINMUX_GPIO20__FUNC_GPIO20>;
+			output-high;
+		};
+	 };
+
+	ts_int_active: ts_int_active {
+		pins_cmd_dat {
+			pinmux = <PINMUX_GPIO21__FUNC_GPIO21>;
+			input-enable;
+		};
+	 };
+
+	ts_reset_suspend: ts_reset_suspend {
+		pins_cmd_dat {
+			pinmux = <PINMUX_GPIO20__FUNC_GPIO20>;
+			slew-rate = <1>;
+			bias-pull-down;
+		};
+	 };
+
+	ts_int_suspend: ts_int_suspend {
+		pins_cmd_dat {
+			pinmux = <PINMUX_GPIO21__FUNC_GPIO21>;
+			slew-rate = <1>;
+			bias-pull-down;
+		};
+	 };
+
+	ts_release: ts_release {
+		pins_cmd0_dat {
+			pinmux = <PINMUX_GPIO20__FUNC_GPIO20>;
+			slew-rate = <1>;
+			bias-pull-up;
+		};
+		pins_cmd1_dat {
+			pinmux = <PINMUX_GPIO21__FUNC_GPIO21>;
+			slew-rate = <1>;
+			bias-disable;
+		};
+	};
+
+	ts_spi_mode: ts_spimode {
+		pins_cmd_dat {
+			pinmux = <PINMUX_GPIO0__FUNC_SPI6_CLK>,
+					 <PINMUX_GPIO1__FUNC_SPI6_CSB>,
+					 <PINMUX_GPIO2__FUNC_SPI6_MI>,
+					 <PINMUX_GPIO3__FUNC_SPI6_MO>;
+			drive-strength = <2>;
+		};
+	 };
+};
+
+&mt_pmic_vmch_ldo_reg {
+	regulator-boot-on;
+	regulator-min-microvolt = <3000000>;
+	regulator-max-microvolt = <3300000>;
+};
+
+&spi6 {
+	status = "okay";
+	#address-cells = <1>;
+	#size-cells = <0>;
+	focaltech@0 {
+		status = "ok";
+		compatible = "focaltech,fts";
+		reg = <0x0>;
+		spi-max-frequency = <6000000>;
+		interrupt-parent = <&pio>;
+		interrupts = <21 IRQ_TYPE_EDGE_FALLING 21 0>;
+		pinctrl-names = "pmx_ts_active", "pmx_ts_suspend", "pmx_ts_release",
+						"ft3658u_spi_mode";
+		pinctrl-0 = <&ts_int_active &ts_reset_active>;
+		pinctrl-1 = <&ts_int_suspend &ts_reset_suspend>;
+		pinctrl-2 = <&ts_release>;
+		pinctrl-3 = <&ts_spi_mode>;
+		vdd-supply = <&mt_pmic_vmch_ldo_reg>;
+		vcc_i2c-supply = <&touch_avdd_i2c_vreg>;
+		focaltech,reset-gpio = <&pio 20 0x00>;
+		focaltech,irq-gpio = <&pio 21 0x2008>;
+		focaltech,max-touch-number = <10>;
+		focaltech,display-coords = <0 0 17280 38400>;
+		focaltech,open-min = <4000>;
+		focaltech,touch-range-array = <1 5 10 15 20>;
+		focaltech,touch-def-array = <3 3 3 3>;
+		focaltech,touch-expert-array = <10 10 10 10
+						20 20 15 10
+						20 20 20 10>;
+	};
+};
+/*TOUCH end*/
+
+//WL2866D start
+&i2c4 {
+	wl2866d1_pm:willsemi,ldo@28 {
+		compatible = "willsemi,wl2866d1";
+		reg = <0x28>;/*slave address*/
+		index = <0>;
+
+		wl2866d1_dvdd1:on,wl2866d1@0{
+			offset = /bits/ 16 <0x0000>;
+			regulator-name ="wl2866d-dvdd1";
+			regulator-min-microvolt = <600000>;
+			regulator-max-microvolt = <1800000>;
+			min-dropout-voltage = <80000>;
+			iout_ua = <500000>;
+			init-voltage = <1050000>;
+		};
+
+		wl2866d1_dvdd2:on,wl2866d1@1{
+			offset = /bits/ 16 <0x0001>;
+			regulator-name ="wl2866d-dvdd2";
+			regulator-min-microvolt = <600000>;
+			regulator-max-microvolt = <1800000>;
+			min-dropout-voltage = <80000>;
+			iout_ua = <500000>;
+			init-voltage = <1260000>;
+		};
+
+		wl2866d1_avdd1:on,wl2866d1@2{
+			offset = /bits/ 16 <0x0002>;
+			regulator-name ="wl2866d-avdd1";
+			regulator-min-microvolt = <1200000>;
+			regulator-max-microvolt = <4300000>;
+			min-dropout-voltage = <90000>;
+			iout_ua = <300000>;
+			init-voltage = <2800000>;
+		};
+
+		wl2866d1_avdd2:on,wl2866d1@3{
+			offset = /bits/ 16 <0x0003>;
+			regulator-name ="wl2866d-avdd2";
+			regulator-min-microvolt = <1200000>;
+			regulator-max-microvolt = <4300000>;
+			min-dropout-voltage = <90000>;
+			iout_ua = <300000>;
+			init-voltage = <2800000>;
+		};
 	};
 };
 
 &odm {
-	thermal_message: thermal-message {
-		board-sensor = "VIRTUAL-SENSOR";
+	testing-mode {
+		compatible = "modem,testing-mode";
+		status-gpio = <&pio 56 0>, <&pio 194 0>;
+		debounce-time = <30>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&test_mode_irq56 &test_mode_irq194>;
 	};
+};
+&pio {
+	test_mode_irq56: test_mode_irq56 {
+                pins_cmd_dat {
+			pinmux = <PINMUX_GPIO56__FUNC_GPIO56>;
+			drive-strength = <2>;
+			bias-disable;
+			input-enable;
+		};
+	};
+    test_mode_irq194: test_mode_irq194 {
+        	pins_cmd_dat {
+			pinmux = <PINMUX_GPIO194__FUNC_GPIO194>;
+			drive-strength = <2>;
+			bias-disable;
+			input-enable;
+		};
+    };
+};
+
+&i2c7 {
+	wl2866d2_pm:willsemi,ldo@28 {
+		compatible = "willsemi,wl2866d2";
+		reg = <0x28>;/*slave address*/
+		index = <1>;
+
+		wl2866d2_dvdd1:on,wl2866d2@0{
+			offset = /bits/ 16 <0x0000>;
+			regulator-name ="wl2866d-dvdd1";
+			regulator-min-microvolt = <600000>;
+			regulator-max-microvolt = <1800000>;
+			min-dropout-voltage = <80000>;
+			iout_ua = <500000>;
+			init-voltage = <1050000>;
+		};
+
+		wl2866d2_dvdd2:on,wl2866d2@1{
+			offset = /bits/ 16 <0x0001>;
+			regulator-name ="wl2866d-dvdd2";
+			regulator-min-microvolt = <600000>;
+			regulator-max-microvolt = <1800000>;
+			min-dropout-voltage = <80000>;
+			iout_ua = <500000>;
+			init-voltage = <1200000>;
+		};
+
+		wl2866d2_avdd1:on,wl2866d2@2{
+			offset = /bits/ 16 <0x0002>;
+			regulator-name ="wl2866d-avdd1";
+			regulator-min-microvolt = <1200000>;
+			regulator-max-microvolt = <4300000>;
+			min-dropout-voltage = <90000>;
+			iout_ua = <300000>;
+			init-voltage = <2800000>;
+		};
+
+		wl2866d2_avdd2:on,wl2866d2@3{
+			offset = /bits/ 16 <0x0003>;
+			regulator-name ="wl2866d-avdd2";
+			regulator-min-microvolt = <1200000>;
+			regulator-max-microvolt = <4300000>;
+			min-dropout-voltage = <90000>;
+			iout_ua = <300000>;
+			init-voltage = <2700000>;
+		};
+	};
+};
+//WL2866D end
+
+&mt6315_6_regulator {
+	interrupts = <18 IRQ_TYPE_LEVEL_HIGH 1 0>;
+};
+
+&mt6315_3_regulator {
+	interrupts = <23 IRQ_TYPE_LEVEL_HIGH 2 0>;
+};
+
+&tboard_thermistor6 {
+        thermal_rename = "xx_therm";
 };
 
 &lk_charger {
@@ -129,8 +367,8 @@ this file is only for attribution of ares
 		1300000 1200000 1100000 1000000 900000 800000 700000
 		600000 500000>;
 	qcom,thermal-mitigation-pd-base
-		= <12400000 11000000 10000000 9000000 8000000 7500000 7000000
-		6800000 6500000 6000000 5000000 4000000 3000000 2000000
+		= <12400000 11000000 9700000 8800000 8000000 7500000 7000000
+		6800000 6500000 6000000 5000000 4000000 3000000 2600000
 		1000000 500000>;
 
 	/* enable_pe_plus; */
@@ -293,6 +531,7 @@ this file is only for attribution of ares
 
 &i2c0 {
 	/* before p1.1 lot1 */
+	clock-frequency = <100000>;
 	bq27z561_i2c0@55 {
 		compatible = "ti,bq27z561_i2c0";
 		reg = <0x55>;
@@ -397,7 +636,7 @@ this file is only for attribution of ares
 		ti,bq2597x,bus-ovp-alarm-threshold = <11000>;
 		//ti,bq2597x,bus-ocp-threshold = <2200>;
 		//ti,bq2597x,bus-ocp-alarm-threshold = <2000>;
-		ti,bq2597x,bus-ocp-threshold = <3750>;
+		ti,bq2597x,bus-ocp-threshold = <4000>;
 		ti,bq2597x,bus-ocp-alarm-threshold = <3500>;
 
 		//ti,bq2597x,bat-ucp-alarm-threshold = <2000>;
@@ -448,7 +687,7 @@ this file is only for attribution of ares
 		ti,bq2597x,bus-ovp-alarm-threshold = <11000>;
 		//ti,bq2597x,bus-ocp-threshold = <2200>;
 		//ti,bq2597x,bus-ocp-alarm-threshold = <2000>;
-		ti,bq2597x,bus-ocp-threshold = <3750>;
+		ti,bq2597x,bus-ocp-threshold = <4000>;
 		ti,bq2597x,bus-ocp-alarm-threshold = <3500>;
 
 		//ti,bq2597x,bat-ucp-alarm-threshold = <2000>;
@@ -488,6 +727,7 @@ this file is only for attribution of ares
 	mi,pd-bus-volt-max = <12000>;
 	mi,pd-bus-curr-max = <6200>;
 	mi,pd-non-ffc-bat-volt-max = <4450>;
+	mi,pd-power-max = <67>; /*charge power max : 67W */
 	mi,cp-sec-enable;
 };
 
@@ -499,114 +739,39 @@ this file is only for attribution of ares
 	};
 };
 
-//WL2866D start
-&i2c4 {
-	wl2866d1_pm:willsemi,ldo@28 {
-		compatible = "willsemi,wl2866d1";
-		reg = <0x28>;/*slave address*/
-		index = <0>;
-
-		wl2866d1_dvdd1:on,wl2866d1@0{
-			offset = /bits/ 16 <0x0000>;
-			regulator-name ="wl2866d-dvdd1";
-			regulator-min-microvolt = <600000>;
-			regulator-max-microvolt = <1800000>;
-			min-dropout-voltage = <80000>;
-			iout_ua = <500000>;
-			init-voltage = <1050000>;
+&dsi0 {
+	status = "okay";
+	#address-cells = <1>;
+	#size-cells = <0>;
+	panel1@0 {
+		compatible = "k10_42_02_0a_dsc_cmd,lcm";
+		reg = <0>;
+		dvdd-supply = <&wl2866d1_dvdd2>;
+		te-gpios = <&pio 41 0>;
+		reset-gpios = <&pio 42 0>;
+		mi,esd-err-irq-gpio = <&pio 132 0x2002>;
+		pinctrl-names = "default";
+		port {
+			panel_in: endpoint {
+				remote-endpoint = <&dsi_out>;
+			};
 		};
-
-		wl2866d1_dvdd2:on,wl2866d1@1{
-			offset = /bits/ 16 <0x0001>;
-			regulator-name ="wl2866d-dvdd2";
-			regulator-min-microvolt = <600000>;
-			regulator-max-microvolt = <1800000>;
-			min-dropout-voltage = <80000>;
-			iout_ua = <500000>;
-			init-voltage = <1260000>;
-		};
-
-		wl2866d1_avdd1:on,wl2866d1@2{
-			offset = /bits/ 16 <0x0002>;
-			regulator-name ="wl2866d-avdd1";
-			regulator-min-microvolt = <1200000>;
-			regulator-max-microvolt = <4300000>;
-			min-dropout-voltage = <90000>;
-			iout_ua = <300000>;
-			init-voltage = <2800000>;
-		};
-
-		wl2866d1_avdd2:on,wl2866d1@3{
-			offset = /bits/ 16 <0x0003>;
-			regulator-name ="wl2866d-avdd2";
-			regulator-min-microvolt = <1200000>;
-			regulator-max-microvolt = <4300000>;
-			min-dropout-voltage = <90000>;
-			iout_ua = <300000>;
-			init-voltage = <2800000>;
+	};
+	ports {
+		port {
+			dsi_out: endpoint {
+				remote-endpoint = <&panel_in>;
+			};
 		};
 	};
 };
 
-&i2c7 {
-	wl2866d2_pm:willsemi,ldo@28 {
-		compatible = "willsemi,wl2866d2";
-		reg = <0x28>;/*slave address*/
-		index = <1>;
-
-		wl2866d2_dvdd1:on,wl2866d2@0{
-			offset = /bits/ 16 <0x0000>;
-			regulator-name ="wl2866d-dvdd1";
-			regulator-min-microvolt = <600000>;
-			regulator-max-microvolt = <1800000>;
-			min-dropout-voltage = <80000>;
-			iout_ua = <500000>;
-			init-voltage = <1050000>;
-		};
-
-		wl2866d2_dvdd2:on,wl2866d2@1{
-			offset = /bits/ 16 <0x0001>;
-			regulator-name ="wl2866d-dvdd2";
-			regulator-min-microvolt = <600000>;
-			regulator-max-microvolt = <1800000>;
-			min-dropout-voltage = <80000>;
-			iout_ua = <500000>;
-			init-voltage = <1200000>;
-		};
-
-		wl2866d2_avdd1:on,wl2866d2@2{
-			offset = /bits/ 16 <0x0002>;
-			regulator-name ="wl2866d-avdd1";
-			regulator-min-microvolt = <1200000>;
-			regulator-max-microvolt = <4300000>;
-			min-dropout-voltage = <90000>;
-			iout_ua = <300000>;
-			init-voltage = <2800000>;
-		};
-
-		wl2866d2_avdd2:on,wl2866d2@3{
-			offset = /bits/ 16 <0x0003>;
-			regulator-name ="wl2866d-avdd2";
-			regulator-min-microvolt = <1200000>;
-			regulator-max-microvolt = <4300000>;
-			min-dropout-voltage = <90000>;
-			iout_ua = <300000>;
-			init-voltage = <2700000>;
-		};
-	};
-};
-//WL2866D end
-
-&mt6315_6_regulator {
-	interrupts = <18 IRQ_TYPE_LEVEL_HIGH 1 0>;
+&msdc0 {
+	status = "disabled";
 };
 
-&mt6315_3_regulator {
-	interrupts = <23 IRQ_TYPE_LEVEL_HIGH 2 0>;
-};
-
-&tboard_thermistor6 {
-        thermal_rename = "xx_therm";
+&msdc1 {
+	status = "disabled";
 };
 
 /* DISPSYS GPIO standardization */
@@ -615,8 +780,7 @@ this file is only for attribution of ares
 		pins_cmd_dat {
 			pinmux = <PINMUX_GPIO132__FUNC_GPIO132>;
 			slew-rate = <0>;
-			bias-pull-up = <MTK_PUPD_SET_R1R0_10>;
-			input-schmitt-enable;
+			bias-disable;
 		};
 	};
 };
@@ -643,137 +807,11 @@ this file is only for attribution of ares
 };
 /* DISPSYS GPIO standardization end */
 
-
-/*TOUCH begin*/
-/*mt_pmic_vs1_buck_reg*/
-&mt6359regulator {
-	touch_avdd_i2c_vreg: touch_avdd_i2c_vreg {
-		compatible = "regulator-fixed";
-		regulator-min-microvolt = <1800000>;
-		regulator-max-microvolt = <1800000>;
-		regulator-name = "touch_avdd_i2c_vreg";
-		enable-active-high;
-		gpio = <&pio 27 0>;
-	};
-};
-
-&pio {
-	ts_reset_active: ts_reset_active {
-		pins_cmd_dat {
-			pinmux = <PINMUX_GPIO20__FUNC_GPIO20>;
-			output-high;
-		};
-	 };
-
-	ts_int_active: ts_int_active {
-		pins_cmd_dat {
-			pinmux = <PINMUX_GPIO21__FUNC_GPIO21>;
-			input-enable;
-		};
-	 };
-
-	ts_reset_suspend: ts_reset_suspend {
-		pins_cmd_dat {
-			pinmux = <PINMUX_GPIO20__FUNC_GPIO20>;
-			slew-rate = <1>;
-			bias-pull-down;
-		};
-	 };
-
-	ts_int_suspend: ts_int_suspend {
-		pins_cmd_dat {
-			pinmux = <PINMUX_GPIO21__FUNC_GPIO21>;
-			slew-rate = <1>;
-			bias-pull-down;
-		};
-	 };
-
-	ts_release: ts_release {
-		pins_cmd0_dat {
-			pinmux = <PINMUX_GPIO20__FUNC_GPIO20>;
-			slew-rate = <1>;
-			bias-pull-up;
-		};
-		pins_cmd1_dat {
-			pinmux = <PINMUX_GPIO21__FUNC_GPIO21>;
-			slew-rate = <1>;
-			bias-disable;
-		};
-	};
-
-	ts_spi_mode: ts_spimode {
-		pins_cmd_dat {
-			pinmux = <PINMUX_GPIO0__FUNC_SPI6_CLK>,
-					 <PINMUX_GPIO1__FUNC_SPI6_CSB>,
-					 <PINMUX_GPIO2__FUNC_SPI6_MI>,
-					 <PINMUX_GPIO3__FUNC_SPI6_MO>;
-			drive-strength = <2>;
-		};
-	 };
-};
-
-&mt_pmic_vmch_ldo_reg {
-	regulator-boot-on;
-	regulator-min-microvolt = <3000000>;
-	regulator-max-microvolt = <3300000>;
-};
-
-&spi6 {
-	status = "okay";
-	#address-cells = <1>;
-	#size-cells = <0>;
-	focaltech@0 {
-		status = "ok";
-		compatible = "focaltech,fts";
-		reg = <0x0>;
-		spi-max-frequency = <6000000>;
-		interrupt-parent = <&pio>;
-		interrupts = <21 IRQ_TYPE_EDGE_FALLING 21 0>;
-		pinctrl-names = "pmx_ts_active", "pmx_ts_suspend", "pmx_ts_release",
-						"ft3658u_spi_mode";
-		pinctrl-0 = <&ts_int_active &ts_reset_active>;
-		pinctrl-1 = <&ts_int_suspend &ts_reset_suspend>;
-		pinctrl-2 = <&ts_release>;
-		pinctrl-3 = <&ts_spi_mode>;
-		vdd-supply = <&mt_pmic_vmch_ldo_reg>;
-		vcc_i2c-supply = <&touch_avdd_i2c_vreg>;
-		focaltech,reset-gpio = <&pio 20 0x00>;
-		focaltech,irq-gpio = <&pio 21 0x2008>;
-		focaltech,max-touch-number = <10>;
-		focaltech,display-coords = <0 0 1080 2400>;
-		focaltech,open-min = <3000>;
-		focaltech,touch-range-array = <1 5 10 15 20>;
-		focaltech,touch-def-array = <3 3 3 3>;
-		focaltech,touch-expert-array = <10 10 10 10
-										20 20 15 10
-										20 20 20 10>;
-	};
-};
-/*TOUCH end*/
-
-&dsi0 {
-	status = "okay";
-	#address-cells = <1>;
-	#size-cells = <0>;
-	panel1@0 {
-		compatible = "k10_42_02_0a_dsc_cmd,lcm";
-		reg = <0>;
-		dvdd-supply = <&wl2866d1_dvdd2>;
-		te-gpios = <&pio 41 0>;
-		reset-gpios = <&pio 42 0>;
-		mi,esd-err-irq-gpio = <&pio 132 0x2008>;
-		pinctrl-names = "default";
-		port {
-			panel_in: endpoint {
-				remote-endpoint = <&dsi_out>;
-			};
-		};
-	};
-	ports {
-		port {
-			dsi_out: endpoint {
-				remote-endpoint = <&panel_in>;
-			};
-		};
+&i2c11 {
+	clock-frequency = <400000>;
+	aw2028@65 {
+		compatible = "awinic, aw2028_i2c";
+		reg = <0x65>;
+		status = "okay";
 	};
 };

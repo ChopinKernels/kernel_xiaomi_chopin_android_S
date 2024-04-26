@@ -2,7 +2,6 @@
  * Mediatek's mt6893 SoC device tree source
  *
  * Copyright (C) 2016 MediaTek Inc.
- * Copyright (C) 2021 XiaoMi, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -108,7 +107,7 @@
 	};
 	led6:led@6 {
 		compatible = "mediatek,lcd-backlight";
-		led_mode = <4>;
+		led_mode = <5>;
 		data = <1>;
 		pwm_config = <0 1 0 0 0>;
 	};
@@ -181,11 +180,17 @@
 };
 
 &mtkfb {
-	pinctrl-names = "lcm_rst_out1_gpio", "lcm_rst_out0_gpio",
+	pinctrl-names = "lcd_bias_enp1_gpio", "lcd_bias_enp0_gpio",
+		"lcd_bias_enn1_gpio", "lcd_bias_enn0_gpio",
+		"lcm_rst_out1_gpio", "lcm_rst_out0_gpio",
 		"mode_te_te";
-	pinctrl-0 = <&mtkfb_pins_lcm_rst_out1_gpio>;
-	pinctrl-1 = <&mtkfb_pins_lcm_rst_out0_gpio>;
-	pinctrl-2 = <&mtkfb_pins_lcm_dsi_te>;
+	pinctrl-0 = <&mtkfb_pins_lcd_bias_enp1>;
+	pinctrl-1 = <&mtkfb_pins_lcd_bias_enp0>;
+	pinctrl-2 = <&mtkfb_pins_lcd_bias_enn1>;
+	pinctrl-3 = <&mtkfb_pins_lcd_bias_enn0>;
+	pinctrl-4 = <&mtkfb_pins_lcm_rst_out1_gpio>;
+	pinctrl-5 = <&mtkfb_pins_lcm_rst_out0_gpio>;
+	pinctrl-6 = <&mtkfb_pins_lcm_dsi_te>;
 	status = "okay";
 };
 
@@ -263,6 +268,7 @@
 &spi1 {
 	#address-cells = <1>;
 	#size-cells = <0>;
+	tee-only;
 	fingerprint@0 {
 		compatible = "goodix,goodix-fp";
 		reg = <0>;
@@ -312,108 +318,6 @@
 	};
 };
 /* FINGERPRINT end */
-
-/*TOUCH begin*/
-/*mt_pmic_vs1_buck_reg*/
-&mt6359regulator {
-	touch_avdd_i2c_vreg: touch_avdd_i2c_vreg {
-		compatible = "regulator-fixed";
-		regulator-min-microvolt = <1800000>;
-		regulator-max-microvolt = <1800000>;
-		regulator-name = "touch_avdd_i2c_vreg";
-		enable-active-high;
-		gpio = <&pio 27 0>;
-	};
-};
-
-&pio {
-	ts_reset_active: ts_reset_active {
-		pins_cmd_dat {
-			pinmux = <PINMUX_GPIO20__FUNC_GPIO20>;
-			output-high;
-		};
-	 };
-
-	ts_int_active: ts_int_active {
-		pins_cmd_dat {
-			pinmux = <PINMUX_GPIO21__FUNC_GPIO21>;
-			input-enable;
-		};
-	 };
-
-	ts_reset_suspend: ts_reset_suspend {
-		pins_cmd_dat {
-			pinmux = <PINMUX_GPIO20__FUNC_GPIO20>;
-			slew-rate = <1>;
-			bias-pull-down;
-		};
-	 };
-
-	ts_int_suspend: ts_int_suspend {
-		pins_cmd_dat {
-			pinmux = <PINMUX_GPIO21__FUNC_GPIO21>;
-			slew-rate = <1>;
-			bias-pull-down;
-		};
-	 };
-
-	ts_release: ts_release {
-		pins_cmd0_dat {
-			pinmux = <PINMUX_GPIO20__FUNC_GPIO20>;
-			slew-rate = <1>;
-			bias-pull-up;
-		};
-		pins_cmd1_dat {
-			pinmux = <PINMUX_GPIO21__FUNC_GPIO21>;
-			slew-rate = <1>;
-			bias-disable;
-		};
-	};
-
-	ts_spi_mode: ts_spimode {
-		pins_cmd_dat {
-			pinmux = <PINMUX_GPIO0__FUNC_SPI6_CLK>,
-					 <PINMUX_GPIO1__FUNC_SPI6_CSB>,
-					 <PINMUX_GPIO2__FUNC_SPI6_MI>,
-					 <PINMUX_GPIO3__FUNC_SPI6_MO>;
-			drive-strength = <2>;
-		};
-	 };
-
-};
-
-&mt_pmic_vmch_ldo_reg {
-	regulator-boot-on;
-	regulator-min-microvolt = <3000000>;
-	regulator-max-microvolt = <3300000>;
-};
-
-&spi6 {
-	status = "okay";
-	#address-cells = <1>;
-	#size-cells = <0>;
-	focaltech@0 {
-		status = "ok";
-		compatible = "focaltech,fts";
-		reg = <0x0>;
-		spi-max-frequency = <6000000>;
-		interrupt-parent = <&pio>;
-		interrupts = <21 IRQ_TYPE_EDGE_FALLING 21 0>;
-		pinctrl-names = "pmx_ts_active", "pmx_ts_suspend", "pmx_ts_release",
-						"ft3658u_spi_mode";
-		pinctrl-0 = <&ts_int_active &ts_reset_active>;
-		pinctrl-1 = <&ts_int_suspend &ts_reset_suspend>;
-		pinctrl-2 = <&ts_release>;
-		pinctrl-3 = <&ts_spi_mode>;
-		vdd-supply = <&mt_pmic_vmch_ldo_reg>;
-		vcc_i2c-supply = <&touch_avdd_i2c_vreg>;
-		focaltech,reset-gpio = <&pio 20 0x00>;
-		focaltech,irq-gpio = <&pio 21 0x2008>;
-		focaltech,max-touch-number = <10>;
-		focaltech,display-coords = <0 0 1080 2400>;
-	};
-};
-/*TOUCH end*/
 
 &mt6360_pmu {
 	mt6360,intr_gpio_num = <24>; /* direct defined GPIO num */
@@ -642,6 +546,20 @@ USB SWITCH GPIO end */
 			};
 		};
 	};
+	panel2@0 {
+		compatible = "truly,ft8756,vdo";
+		reg = <1>;
+		pm-enable-gpios = <&pio 41 0>;
+		reset-gpios = <&pio 42 0>;
+		bias-gpios = <&pio 28 0>,
+			<&pio 29 0>;
+		pinctrl-names = "default";
+		port {
+			panel_in2: endpoint {
+				remote-endpoint = <&dsi_out>;
+			};
+		};
+	};
 	ports {
 		port {
 			dsi_out: endpoint {
@@ -723,9 +641,7 @@ USB SWITCH GPIO end */
 
 	et7480-i2c-handle = <&et7480>;
 };
-
-
-#include "mediatek/cust_mt6893_touch_1080x2300.dtsi"
+#include "mediatek/cust_mt6893_touch.dtsi"
 #include "mediatek/cust_mt6891_camera.dtsi"
 #include <k6891v1_64/cust.dtsi>
 /*End of this file, DO NOT ADD ANYTHING HERE*/

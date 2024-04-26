@@ -2,7 +2,6 @@
  * Mediatek's mt6893 SoC device tree source
  *
  * Copyright (C) 2016 MediaTek Inc.
- * Copyright (C) 2021 XiaoMi, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -231,6 +230,7 @@
 &spi1 {
 	#address-cells = <1>;
 	#size-cells = <0>;
+	tee-only;
 	fingerprint@0 {
 		compatible = "goodix,goodix-fp";
 		reg = <0>;
@@ -281,7 +281,6 @@
 };
 /* FINGERPRINT end */
 
-/*TOUCH begin*/
 /*mt_pmic_vs1_buck_reg*/
 &mt6359regulator {
 	touch_avdd_i2c_vreg: touch_avdd_i2c_vreg {
@@ -381,7 +380,6 @@
 		focaltech,display-coords = <0 0 1080 2400>;
 	};
 };
-/*TOUCH end*/
 
 &mt6360_pmu {
 	mt6360,intr_gpio_num = <24>; /* direct defined GPIO num */
@@ -619,6 +617,8 @@ USB SWITCH GPIO end */
 	};
 };
 
+
+
 /* AW8697 Haptic start */
 &pio {
 	aw8697_reset_high: aw8697_reset_reset {
@@ -645,6 +645,12 @@ USB SWITCH GPIO end */
 			input-enable;
 		};
 	};
+};
+
+/* CAMERA specify sensor */
+&kd_camera_hw1 {
+	cam2_enable_sensor = "s5k3m5sx_mipi_raw s5kjd1_mipi_raw";
+	cam4_enable_sensor = "imx481_mipi_raw";
 };
 
 &i2c7 {
@@ -783,7 +789,6 @@ USB SWITCH GPIO end */
 	};
 };
 /* AW8697 Haptic end */
-
 &pio {
 	uart_gpio_enable: uart_gpio_enable@gpio101 {
 		pins_cmd_dat {
@@ -827,9 +832,7 @@ USB SWITCH GPIO end */
 
 	et7480-i2c-handle = <&et7480>;
 };
-
-
-#include "mediatek/cust_mt6893_touch_1080x2300.dtsi"
+#include "mediatek/cust_mt6893_touch.dtsi"
 #include "mediatek/cust_mt6893_camera.dtsi"
 #include <k6893v1_64/cust.dtsi>
 /*End of this file, DO NOT ADD ANYTHING HERE*/

@@ -2,7 +2,6 @@
  * Mediatek's mt6893 SoC device tree source
  *
  * Copyright (C) 2016 MediaTek Inc.
- * Copyright (C) 2021 XiaoMi, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -249,8 +248,8 @@
 	pinctrl-1 = <&fingerprint_reset_high>;
 	pinctrl-2 = <&fingerprint_reset_low>;
 	pinctrl-3 = <&fingerprint_eint_init>;
+        fpc,gpio_irq = <&pio 15 0>;
 	pinctrl-4 = <&fingerprint_spi_cs>;
-	fpc,gpio_irq = <&pio 15 0>;
 	interrupt-parent = <&pio>;
 	interrupts = <15 IRQ_TYPE_EDGE_RISING 15 0>;
 	status = "okay";
@@ -512,36 +511,6 @@ USB SWITCH GPIO end */
 };
 */
 
-&odm {
-	testing-mode {
-		compatible = "modem,testing-mode";
-		status-gpio = <&pio 56 0>, <&pio 194 0>;
-		debounce-time = <30>;
-		pinctrl-names = "default";
-		pinctrl-0 = <&test_mode_irq56 &test_mode_irq194>;
-	};
-};
-
-&pio {
-	test_mode_irq56: test_mode_irq56 {
-                pins_cmd_dat {
-			pinmux = <PINMUX_GPIO56__FUNC_GPIO56>;
-			drive-strength = <2>;
-			bias-disable;
-			input-enable;
-		};
-	};
-
-    test_mode_irq194: test_mode_irq194 {
-        	pins_cmd_dat {
-			pinmux = <PINMUX_GPIO194__FUNC_GPIO194>;
-			drive-strength = <2>;
-			bias-disable;
-			input-enable;
-		};
-    };
-};
-
 /* AW8697 Haptic start */
 &pio {
 	aw8697_reset_high: aw8697_reset_reset {
@@ -586,7 +555,7 @@ USB SWITCH GPIO end */
 		vib_cont_zc_thr = < 0x08f8 >;  /*hq 0x08F8 */
 		vib_cont_num_brk = < 3 >;
 		vib_f0_coeff = < 260 >; /*Don't modify it    2.604167*/
-		vib_f0_trace_parameter = < 9 3 1 31 >;
+		vib_f0_trace_parameter = < 0x05 0x03 0x02 0x0f >;
 		vib_bemf_config = < 0 0x08 0x03 0xf8 >;
 		vib_sw_brake = < 0x2c >;
 		vib_tset = < 0x1a >;
@@ -722,7 +691,7 @@ USB SWITCH GPIO end */
 		vib_cont_zc_thr = < 0x08f8 >;  /*hq 0x08F8 */
 		vib_cont_num_brk = < 3 >;
 		vib_f0_coeff = < 260 >; /*Don't modify it    2.604167*/
-		vib_f0_trace_parameter = < 9 3 1 31 >;
+		vib_f0_trace_parameter = < 0x05 0x03 0x02 0x0f >;
 		vib_bemf_config = < 0 0x08 0x03 0xf8 >;
 		vib_sw_brake = < 0x2c >;
 		vib_tset = < 0x1a >;
@@ -951,6 +920,9 @@ USB SWITCH GPIO end */
 };
 /* Audio End */
 
+
+
+#include "mediatek/cust_mt6893_touch.dtsi"
 /*GAMEKEY start*/
 &gamekey {
     status = "ok";
@@ -1032,13 +1004,9 @@ USB SWITCH GPIO end */
       pinctrl-2 = <&nfc_int_suspend &nfc_enable_suspend>;
 //         &nfc_clk_req_suspend>;
     };
-        irq_nfc: irq_nfc {
-                compatible = "mediatek,irq_nfc-eint";
-                reg = <0x08>;
-        };
+        
 };
 //NFC end 
 
-#include "mediatek/cust_mt6893_touch_1080x2300.dtsi"
-#include <k6893v1_64/cust.dtsi>
+#include "mediatek/ares/cust.dtsi"
 /*End of this file, DO NOT ADD ANYTHING HERE*/

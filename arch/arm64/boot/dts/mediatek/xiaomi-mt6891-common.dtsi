@@ -2,7 +2,6 @@
  * Mediatek's mt6893 SoC device tree source
  *
  * Copyright (C) 2016 MediaTek Inc.
- * Copyright (C) 2021 XiaoMi, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -186,7 +185,7 @@
 
 /* IRTX GPIO Start */
 &irtx_pwm {
-        pwm_ch = <0>;
+	pwm_ch = <0>;
 	pinctrl-names = "irtx_gpio_led_default", "irtx_gpio_led_set";
 	pinctrl-0 = <&irtx_gpio_led_default>;
 	pinctrl-1 = <&irtx_gpio_led_set>;
@@ -584,14 +583,10 @@ USB SWITCH GPIO end */
       pinctrl-2 = <&nfc_int_suspend &nfc_enable_suspend>;
 //         &nfc_clk_req_suspend>;
     };
-        irq_nfc: irq_nfc {
-                compatible = "mediatek,irq_nfc-eint";
-                reg = <0x08>;
-        };
+       
 };
 //NFC end 
 
-//#include "mediatek/cust_mt6893_touch_1080x2300.dtsi"
 #include "mediatek/cust_mt6891_camera.dtsi"
 //#include <k6891v1_64/cust.dtsi>
 /*End of this file, DO NOT ADD ANYTHING HERE*/
