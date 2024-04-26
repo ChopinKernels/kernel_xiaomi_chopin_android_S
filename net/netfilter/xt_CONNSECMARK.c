@@ -35,16 +35,16 @@ MODULE_ALIAS("ip6t_CONNSECMARK");
  */
 static void secmark_save(const struct sk_buff *skb)
 {
-	// if (skb->secmark) {
-	// 	struct nf_conn *ct;
-	// 	enum ip_conntrack_info ctinfo;
+	if (skb->secmark) {
+		struct nf_conn *ct;
+		enum ip_conntrack_info ctinfo;
 
-	// 	ct = nf_ct_get(skb, &ctinfo);
-	// 	if (ct && !ct->secmark) {
-	// 		ct->secmark = skb->secmark;
-	// 		nf_conntrack_event_cache(IPCT_SECMARK, ct);
-	// 	}
-	// }
+		ct = nf_ct_get(skb, &ctinfo);
+		if (ct && !ct->secmark) {
+			ct->secmark = skb->secmark;
+			nf_conntrack_event_cache(IPCT_SECMARK, ct);
+		}
+	}
 }
 
 /*
@@ -53,14 +53,14 @@ static void secmark_save(const struct sk_buff *skb)
  */
 static void secmark_restore(struct sk_buff *skb)
 {
-	// if (!skb->secmark) {
-	// 	const struct nf_conn *ct;
-	// 	enum ip_conntrack_info ctinfo;
+	if (!skb->secmark) {
+		const struct nf_conn *ct;
+		enum ip_conntrack_info ctinfo;
 
-	// 	ct = nf_ct_get(skb, &ctinfo);
-	// 	if (ct && ct->secmark)
-	// 		skb->secmark = ct->secmark;
-	// }
+		ct = nf_ct_get(skb, &ctinfo);
+		if (ct && ct->secmark)
+			skb->secmark = ct->secmark;
+	}
 }
 
 static unsigned int
