@@ -404,7 +404,7 @@ ENTRY(el2_setup)
 1:	mov_q	x0, (SCTLR_EL2_RES1 | ENDIAN_SET_EL2)
 	msr	sctlr_el2, x0
 
-#ifdef CONFIG_ARM64_VHE
+    // WTF? YOU SHOULD RUN AT EL2!
 	/*
 	 * Check for VHE being present. For the rest of the EL2 setup,
 	 * x2 being non-zero indicates that we do have VHE, and that the
@@ -412,9 +412,6 @@ ENTRY(el2_setup)
 	 */
 	mrs	x2, id_aa64mmfr1_el1
 	ubfx	x2, x2, #8, #4
-#else
-	mov	x2, xzr
-#endif
 
 	/* Hyp configuration. */
 	mov_q	x0, HCR_HOST_NVHE_FLAGS
