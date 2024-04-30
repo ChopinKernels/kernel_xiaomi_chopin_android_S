@@ -519,3 +519,4 @@ CONFIG_S390_AP_IOMMU=y
 
 # This is needed, otherwise kernel will drop to EL1
 CONFIG_ARM64_VHE=1
+
